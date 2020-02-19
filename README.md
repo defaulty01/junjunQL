@@ -1,7 +1,8 @@
 Description:
 	This is a GraphQL Schema Map Viewer. Please don't judge my coding skills
 
-USAGE: 
+Usage:
+``` 
     -url [gql endpoit]	Target Domain
     -T			View All GraphQL Types Schema
     -t [name]		View GraphQL Schema Types
@@ -9,7 +10,7 @@ USAGE:
     -q [name]		View GraphQL Schema Query
     -M 			View All GraphQL Schema Mutation
     -m [name]		View GraphQL Schema Mutation
-
+```
 
 Example:
 ```
