@@ -1,5 +1,8 @@
 Description:
-	This is a GraphQL Schema Map Viewer. Please don't judge my coding skills
+	This is a GraphQL Schema Map Viewer. This will help you to determine, list and generate graphql queries and mutations on your target domain.
+
+
+  Please don't judge my coding skills :(
 
 Usage:
 ``` 

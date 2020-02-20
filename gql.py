@@ -29,31 +29,27 @@ def genQuery(dType = "", name = ""):
 	data = schema[dType]['fields']
 	param = ""
 
-	if dType == "mutationType":
-		for x in range(len(data)):
-			if name == data[x]['name']:
-				for y in range(len(data[x]['args'])):
-					if (y+1) == len(data[x]['args']):
-						param = param + str(data[x]['args'][y]['name'])+": \"\""
-					else:
-						param = param + str(data[x]['args'][y]['name'])+": \"\", "
+	for x in range(len(data)):
+		if name == data[x]['name']:
+			for y in range(len(data[x]['args'])):
+				if (y+1) == len(data[x]['args']):
+					param = param + str(data[x]['args'][y]['name'])+": \\\"\\\""
+				else:
+					param = param + str(data[x]['args'][y]['name'])+": \\\"\\\", "
 
-				nType = data[x]['type']['name']
+			nType = data[x]['type']['name']
 
-				return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
+			if nType == None:
+				res = ""
+			else:
+				res = getTypeField(nType)
 
-	if dType == "queryType":
-		for x in range(len(data)):
-			if name == data[x]['name']:
-				for y in range(len(data[x]['args'])):
-					if (y+1) == len(data[x]['args']):
-						param = param + str(data[x]['args'][y]['name'])+": \"\""
-					else:
-						param = param + str(data[x]['args'][y]['name'])+": \"\", "
+			if dType == "mutationType":
+				return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
+			
+			if dType == "queryType":
+				return "query { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
 
-				nType = data[x]['type']['name']
-
-				return "query { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
 
 
 def getTypeField(name = ""):
@@ -145,7 +141,7 @@ def displayQueryMutation(dType = "",name = "",idx = 0):
 		print "   	> description: " + str(data[idx]['args'][idy]['type']['description'])
 		print "   - description: " + str(data[idx]['args'][idy]['description']) 
 		print ""
-	print "[+] Generated GQL Query: "  
+	print "[+] Generated GQL Query: Soon"  
 	print "   " + str(genQuery(dType, data[idx]['name']))
 
 
