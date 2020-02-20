@@ -11,7 +11,7 @@ header = {
 
 def getSchema(endpoint):
 	query = {
-		"query":"{__schema{ types{ kind name fields { type { name kind description } description name args { description defaultValue name defaultValue } } ofType { name description } interfaces { name description } enumValues { description deprecationReason } description inputFields { description defaultValue } } queryType { name description kind fields{ name args { description defaultValue name type { name description } } type { name description } description } description } mutationType { name description kind fields{ name args { description defaultValue name type { name description } } type { name description } description } description } } }"
+		"query":"{__schema{ types{ possibleTypes{ name kind } kind name fields { type { name kind description } description name args { description defaultValue name defaultValue } } ofType { name description } interfaces { name description } enumValues { description deprecationReason } description inputFields { description defaultValue } } queryType { name description kind fields{ name args { description defaultValue name type { name description } } type { name description } description } description } mutationType { name description kind fields{ name args { description defaultValue name type { name description } } type { name description } description } description } } }"
 		}
 
 	url = endpoint 
@@ -29,17 +29,31 @@ def genQuery(dType = "", name = ""):
 	data = schema[dType]['fields']
 	param = ""
 
-	for x in range(len(data)):
-		if name == data[x]['name']:
-			for y in range(len(data[x]['args'])):
-				if (y+1) == len(data[x]['args']):
-					param = param + str(data[x]['args'][y]['name'])+": \"\""
-				else:
-					param = param + str(data[x]['args'][y]['name'])+": \"\", "
+	if dType == "mutationType":
+		for x in range(len(data)):
+			if name == data[x]['name']:
+				for y in range(len(data[x]['args'])):
+					if (y+1) == len(data[x]['args']):
+						param = param + str(data[x]['args'][y]['name'])+": \"\""
+					else:
+						param = param + str(data[x]['args'][y]['name'])+": \"\", "
 
-			nType = data[x]['type']['name']
+				nType = data[x]['type']['name']
 
-			return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
+				return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
+
+	if dType == "queryType":
+		for x in range(len(data)):
+			if name == data[x]['name']:
+				for y in range(len(data[x]['args'])):
+					if (y+1) == len(data[x]['args']):
+						param = param + str(data[x]['args'][y]['name'])+": \"\""
+					else:
+						param = param + str(data[x]['args'][y]['name'])+": \"\", "
+
+				nType = data[x]['type']['name']
+
+				return "query { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
 
 
 def getTypeField(name = ""):
@@ -93,6 +107,12 @@ def displayType(name = "",idx = 0):
 			print ""
 	else:
 		print "[+] Fields: None"
+	if data[idx]['possibleTypes'] != None:
+		print "[+] Possible Types: " 
+		for idz in range(len(data[idx]['possibleTypes'])):
+			print "   - name: " + str(data[idx]['possibleTypes'][idz]['name'])
+	else:
+		print "[+] Possible Types: None" 
 
 def displayQueryMutation(dType = "",name = "",idx = 0):
 	data = schema[dType]['fields']
@@ -125,8 +145,8 @@ def displayQueryMutation(dType = "",name = "",idx = 0):
 		print "   	> description: " + str(data[idx]['args'][idy]['type']['description'])
 		print "   - description: " + str(data[idx]['args'][idy]['description']) 
 		print ""
-
-	print "[+] Generated GQL Query: " + str(genQuery(dType, data[idx]['name'])) 
+	print "[+] Generated GQL Query: "  
+	print "   " + str(genQuery(dType, data[idx]['name']))
 
 
 def getMutationType(name = ""):
