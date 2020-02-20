@@ -1,8 +1,18 @@
 Description:
-	This is a GraphQL Schema Map Viewer. This will help you to determine, list and generate graphql queries and mutations on your target domain.
+	A simple recon script for graphql query and mutation. What this tool does is, it seeks all hidden queries and mutations on a graphQL endpoint on a target domain.
 
+  This is still under develop...
 
   Please don't judge my coding skills :(
+
+  Hope this will help hunters to find more bugs on GraphQL endpoints
+
+
+
+Bug:
+  Still have issues on terminating the dept of recursion during enumerating all returned types
+
+
 
 Usage:
 ``` 
@@ -27,63 +37,60 @@ terminal$ python gql.py
     -M 			View All GraphQL Schema Mutation
     -m [name]		View GraphQL Schema Mutation
 
-terminal$ python gql.py --url https://hackerone.com/graphql? -Q
+terminal$ $ python gql.py -url https://hackerone.com/graphql? -t BankTransferReference
 ===========================================================================================================
-     ---------------------------------------- QUERY TYPE INFO ----------------------------------------
+       ---------------------------------------- TYPE INFO ----------------------------------------
 ===========================================================================================================
-[+] Query Name: application
-[+] Description: None
-[+] Type: 
-   - name: None
-   - description: None
-[+] Args: 
-[+] Generated GQL Query: Soon
-===========================================================================================================
-     ---------------------------------------- QUERY TYPE INFO ----------------------------------------
-===========================================================================================================
-[+] Query Name: assignable_teams
-[+] Description: None
-[+] Type: 
-   - name: TeamConnection
-   - description: The connection type for Team.
-[+] Args: 
+[+] Type Name: BankTransferReference
+[+] Description: Resources for setting up the Bank Transfer payment method
+[+] Kind: OBJECT
+[+] Fields: 
    [1]
-   - name: after
-   - default value: None
-   - type: 
-   	> name: String
-   	> description: Represents textual data as UTF-8 character sequences. This type is most often used by GraphQL to represent free-form human-readable text.
-   - description: Returns the elements in the list that come after the specified cursor.
+   - name: beneficiary_required_details
+   - description: None
+   - args: [{u'defaultValue': None, u'description': None, u'name': u'currency'}, {u'defaultValue': None, u'description': None, u'name': u'bank_account_country'}, {u'defaultValue': None, u'description': None, u'name': u'beneficiary_country'}]
+   - type: BeneficiaryRequiredDetail
+    > description: A specification of information needed to create a bank transfer payment preference
+    > kind: OBJECT
 
    [2]
-   - name: before
-   - default value: None
-   - type: 
-   	> name: String
-   	> description: Represents textual data as UTF-8 character sequences. This type is most often used by GraphQL to represent free-form human-readable text.
-   - description: Returns the elements in the list that come before the specified cursor.
+   - name: countries
+   - description: None
+   - args: []
+   - type: None
+    > description: None
+    > kind: LIST
 
    [3]
-   - name: first
-   - default value: None
-   - type: 
-   	> name: Int
-   	> description: Represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
-   - description: Returns the first _n_ elements from the list.
+   - name: currencies
+   - description: None
+   - args: []
+   - type: None
+    > description: None
+    > kind: LIST
 
    [4]
-   - name: last
-   - default value: None
-   - type: 
-   	> name: Int
-   	> description: Represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
+   - name: id
+   - description: None
+   - args: []
+   - type: None
+    > description: None
+    > kind: NON_NULL
 
-   	.
-   	.
-   	.
-   	.
-   	.
+[+] Possible Types: None
 
-   	
+terminal$  python gql.py -url https://hackerone.com/graphql? -q bank_transfer_reference
+===========================================================================================================
+     ---------------------------------------- QUERY TYPE INFO ----------------------------------------
+===========================================================================================================
+[+] Query Name: bank_transfer_reference
+[+] Description: None
+[+] Type: 
+   - name: BankTransferReference
+   - description: Resources for setting up the Bank Transfer payment method
+[+] Args: 
+[+] Generated GQL Query: Soon
+   query { webhook_event_types(){ beneficiary_required_details{beneficiary_required_details{edges, nodes, pageInfo}, currency, id}, countries, currencies, id } }
+
 ```
 
