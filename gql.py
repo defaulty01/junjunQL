@@ -22,6 +22,47 @@ def getSchema(endpoint):
 	return data['data']['__schema']
 
 
+
+
+def genQuery(dType = "", name = ""):
+	#schema = getSchema(sys.argv[2])
+	data = schema[dType]['fields']
+	param = ""
+
+	for x in range(len(data)):
+		if name == data[x]['name']:
+			for y in range(len(data[x]['args'])):
+				if (y+1) == len(data[x]['args']):
+					param = param + str(data[x]['args'][y]['name'])+": \"\""
+				else:
+					param = param + str(data[x]['args'][y]['name'])+": \"\", "
+
+			nType = data[x]['type']['name']
+
+			return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ getTypeField(nType) +" } }"
+
+
+def getTypeField(name = ""):
+	#schema = getSchema(sys.argv[2])
+	res = schema['types']
+	tmp = ""
+	for a in range(len(res)):
+		if name == res[a]['name']:
+			for b in range(len(res[a]['fields'])):
+				if str(res[a]['fields'][b]['type']['kind']) == "OBJECT":
+				 	tmp = getTypeField(res[a]['fields'][b]['type']['name'])
+				 	tmp = str(res[a]['fields'][b]['name']) + "{" + tmp + "}, "
+				else:
+					if ((b+1) == len(res[a]['fields'])):
+						tmp = tmp + str(res[a]['fields'][b]['name'])
+					else:
+						tmp = tmp + str(res[a]['fields'][b]['name'])+", "
+					
+					param = tmp
+
+			return param
+
+
 def getTypes(name = ""):
 	for x in range(len(schema['types'])):
 		if name == '':
@@ -31,60 +72,61 @@ def getTypes(name = ""):
 
 
 def displayType(name = "",idx = 0):
+	data = schema['types']
+
 	print "==========================================================================================================="
 	print "       ---------------------------------------- TYPE INFO ----------------------------------------"
 	print "==========================================================================================================="
-	print "[+] Type Name: " +schema['types'][idx]['name']
-	print "[+] Description: " +str(schema['types'][idx]['description'])
-	print "[+] Kind: " +str(schema['types'][idx]['kind'])
-	if schema['types'][idx]['fields'] != None:
+	print "[+] Type Name: " +data[idx]['name']
+	print "[+] Description: " +str(data[idx]['description'])
+	print "[+] Kind: " +str(data[idx]['kind'])
+	if data[idx]['fields'] != None:
 		print "[+] Fields: "
-		for idy in range(len(schema['types'][idx]['fields'])):
+		for idy in range(len(data[idx]['fields'])):
 			print "   ["+ str(idy+1) +"]"
-			print "   - name: " + str(schema['types'][idx]['fields'][idy]['name'])
-			print "   - description: " + str(schema['types'][idx]['fields'][idy]['description']) 
-			print "   - args: " + str(schema['types'][idx]['fields'][idy]['args'])
-			print "   - type: " + str(schema['types'][idx]['fields'][idy]['type']['name'])
-			print "   	> description: " + str(schema['types'][idx]['fields'][idy]['type']['description'])
-			print "   	> kind: " + str(schema['types'][idx]['fields'][idy]['type']['kind'])
+			print "   - name: " + str(data[idx]['fields'][idy]['name'])
+			print "   - description: " + str(data[idx]['fields'][idy]['description']) 
+			print "   - args: " + str(data[idx]['fields'][idy]['args'])
+			print "   - type: " + str(data[idx]['fields'][idy]['type']['name'])
+			print "   	> description: " + str(data[idx]['fields'][idy]['type']['description'])
+			print "   	> kind: " + str(data[idx]['fields'][idy]['type']['kind'])
 			print ""
 	else:
 		print "[+] Fields: None"
 
 def displayQueryMutation(dType = "",name = "",idx = 0):
+	data = schema[dType]['fields']
+
 	if dType == "mutationType":
-		displayType = dType
 		print "==========================================================================================================="
 		print "   ---------------------------------------- MUTATION TYPE INFO ----------------------------------------"
 		print "==========================================================================================================="
 		
-		print "[+] Mutation Name: " +schema[displayType]['fields'][idx]['name']
+		print "[+] Mutation Name: " +data[idx]['name']
 
 	if dType == "queryType":
-		displayType = dType
 		print "==========================================================================================================="
 		print "     ---------------------------------------- QUERY TYPE INFO ----------------------------------------"
 		print "==========================================================================================================="
 		
-		print "[+] Query Name: " +schema[displayType]['fields'][idx]['name']
-
+		print "[+] Query Name: " +data[idx]['name']
 	
-	print "[+] Description: " + str(schema[displayType]['fields'][idx]['description'])
+	print "[+] Description: " + str(data[idx]['description'])
 	print "[+] Type: "
-	print "   - name: " + str(schema[displayType]['fields'][idx]['type']['name'])
-	print "   - description: " + str(schema[displayType]['fields'][idx]['type']['description'])
+	print "   - name: " + str(data[idx]['type']['name'])
+	print "   - description: " + str(data[idx]['type']['description'])
 	print "[+] Args: "
-	for idy in range(len(schema[displayType]['fields'][idx]['args'])):
+	for idy in range(len(data[idx]['args'])):
 		print "   ["+ str(idy+1) +"]"
-		print "   - name: " + str(schema[displayType]['fields'][idx]['args'][idy]['name'])
-		print "   - default value: " + str(schema[displayType]['fields'][idx]['args'][idy]['defaultValue'])
+		print "   - name: " + str(data[idx]['args'][idy]['name'])
+		print "   - default value: " + str(data[idx]['args'][idy]['defaultValue'])
 		print "   - type: "
-		print "   	> name: " + str(schema[displayType]['fields'][idx]['args'][idy]['type']['name'])
-		print "   	> description: " + str(schema[displayType]['fields'][idx]['args'][idy]['type']['description'])
-		print "   - description: " + str(schema[displayType]['fields'][idx]['args'][idy]['description']) 
+		print "   	> name: " + str(data[idx]['args'][idy]['type']['name'])
+		print "   	> description: " + str(data[idx]['args'][idy]['type']['description'])
+		print "   - description: " + str(data[idx]['args'][idy]['description']) 
 		print ""
 
-	print "[+] Generated GQL Query: Soon" 
+	print "[+] Generated GQL Query: " + str(genQuery(dType, data[idx]['name'])) 
 
 
 def getMutationType(name = ""):
@@ -160,7 +202,7 @@ main()
 
 
 
-
+			
 
 
 
