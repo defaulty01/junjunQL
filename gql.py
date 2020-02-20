@@ -28,7 +28,7 @@ def genQuery(dType = "", name = ""):
 	#schema = getSchema(sys.argv[2])
 	data = schema[dType]['fields']
 	param = ""
-
+	
 	for x in range(len(data)):
 		if name == data[x]['name']:
 			for y in range(len(data[x]['args'])):
@@ -44,11 +44,12 @@ def genQuery(dType = "", name = ""):
 			else:
 				res = getTypeField(nType)
 
-			if dType == "mutationType":
-				return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
 			
-			if dType == "queryType":
-				return "query { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
+	if dType == "mutationType":
+		return "mutation { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
+			
+	if dType == "queryType":
+		return "query { " + str(data[x]['name']) + "(" + param + "){ "+ res +" } }"
 
 
 
@@ -56,12 +57,20 @@ def getTypeField(name = ""):
 	#schema = getSchema(sys.argv[2])
 	res = schema['types']
 	tmp = ""
+	param = ""
+
 	for a in range(len(res)):
 		if name == res[a]['name']:
 			for b in range(len(res[a]['fields'])):
 				if str(res[a]['fields'][b]['type']['kind']) == "OBJECT":
-				 	tmp = getTypeField(res[a]['fields'][b]['type']['name'])
-				 	tmp = str(res[a]['fields'][b]['name']) + "{" + tmp + "}, "
+					if ((b+1) == len(res[a]['fields'])):
+					 	tmp = getTypeField(res[a]['fields'][b]['type']['name'])
+					 	tmp = str(res[a]['fields'][b]['name']) + "{" + tmp + "}"
+					else:
+					 	tmp = getTypeField(res[a]['fields'][b]['type']['name'])
+					 	tmp = str(res[a]['fields'][b]['name']) + "{" + tmp + "}, "
+
+					param = param + tmp
 				else:
 					if ((b+1) == len(res[a]['fields'])):
 						tmp = tmp + str(res[a]['fields'][b]['name'])
@@ -69,8 +78,8 @@ def getTypeField(name = ""):
 						tmp = tmp + str(res[a]['fields'][b]['name'])+", "
 					
 					param = tmp
-
-			return param
+		
+	return param
 
 
 def getTypes(name = ""):
